@@ -2,30 +2,30 @@ name: build
 on: [push, pull_request]
 jobs:
 build:
-runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
         fail-fast: false
-            matrix:
-                os: [windows-latest]
-                build_type: [Release]
-                enable_ui: [on]
-                include:
-                  - os: windows-latest
-                    build_type: Release
-                    enable_ui: on
+        matrix:
+            os: [windows-latest]
+            build_type: [Release]
+            enable_ui: [on]
+            include:
+                - os: windows-latest
+                build_type: Release
+                enable_ui: on
     steps:
-      - uses: actions/checkout@v3
+        - uses: actions/checkout@v3
         with:
             submodules: 'recursive'
-      - name: ccache
+        - name: ccache
         uses: hendrikmuhs/ccache-action@v1
         if: runner.os == 'Linux'
         with:
             key: ${{ matrix.os }}-${{ matrix.enable_ui }}
-      - uses: seanmiddleditch/gha-setup-ninja@master
-      - uses: ilammy/msvc-dev-cmd@v1
+        - uses: seanmiddleditch/gha-setup-ninja@master
+        - uses: ilammy/msvc-dev-cmd@v1
         if: runner.os == 'Windows'
-      - name: Install Dependencies
+        - name: Install Dependencies
         shell: bash
         run: |
             if [[ "${{ runner.os }}" == "Linux" ]] ; then
@@ -33,7 +33,7 @@ runs-on: ${{ matrix.os }}
                 sudo apt-get install -y \
                     libx11-dev libxcursor-dev libxi-dev
             fi
-      - name: Generating Makefiles
+        - name: Generating Makefiles
         shell: bash
         run: |
             if [[ "${{ runner.os }}" == "Windows" ]] ; then
@@ -51,13 +51,13 @@ runs-on: ${{ matrix.os }}
                 -DSKIA_DIR=./skia \
                 -DSKIA_LIBRARY_DIR=./skia/out/Release-x64 \
                 -DSKIA_LIBRARY=./skia/out/Release-x64/skia.lib
-      - name: Compiling
+        - name: Compiling
         shell: bash
         run: |
             cd build && ninja
-      - uses: actions/upload-artifact@v3
+        - uses: actions/upload-artifact@v3
             with:
-              name: aseprite
-              path: |
-                  D:/a/aseprite/aseprite/build/bin/data
-                  D:/a/aseprite/aseprite/build/bin/aseprite.exe
+                name: aseprite
+                path: |
+                    D:/a/aseprite/aseprite/build/bin/data
+                    D:/a/aseprite/aseprite/build/bin/aseprite.exe
